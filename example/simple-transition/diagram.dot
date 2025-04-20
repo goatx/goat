@@ -1,0 +1,59 @@
+digraph {
+  857836209921096945 [ label="StateMachines:
+StateMachine = {Name:Mut,Type:int,Value:2}; State: {Name:StateType,Type:main.StateType,Value:C}
+
+QueuedEvents:
+StateMachine << entryEvent;" ];
+  857836209921096945 [ color=red, penwidth=3 ];
+  1960329270333910849 [ label="StateMachines:
+StateMachine = {Name:Mut,Type:int,Value:1}; State: {Name:StateType,Type:main.StateType,Value:B}
+
+QueuedEvents:
+StateMachine << entryEvent;" ];
+  3987276887090901495 [ label="StateMachines:
+StateMachine = {Name:Mut,Type:int,Value:2}; State: {Name:StateType,Type:main.StateType,Value:B}
+
+QueuedEvents:
+StateMachine << exitEvent;
+StateMachine << transitionEvent; {Name:To,Type:goat.AbstractState,Value:&{{0} C}}
+StateMachine << entryEvent;" ];
+  3987276887090901495 [ color=red, penwidth=3 ];
+  5277167961608379654 [ label="StateMachines:
+StateMachine = {Name:Mut,Type:int,Value:1}; State: {Name:StateType,Type:main.StateType,Value:A}
+
+QueuedEvents:
+StateMachine << exitEvent;
+StateMachine << transitionEvent; {Name:To,Type:goat.AbstractState,Value:&{{0} B}}
+StateMachine << entryEvent;" ];
+  12584546932387734379 [ label="StateMachines:
+StateMachine = {Name:Mut,Type:int,Value:3}; State: {Name:StateType,Type:main.StateType,Value:C}
+
+QueuedEvents:" ];
+  12584546932387734379 [ color=red, penwidth=3 ];
+  12694363019802379037 [ label="StateMachines:
+StateMachine = {Name:Mut,Type:int,Value:0}; State: {Name:StateType,Type:main.StateType,Value:A}
+
+QueuedEvents:
+StateMachine << entryEvent;" ];
+  12694363019802379037 [ penwidth=5 ];
+  15725610466176215872 [ label="StateMachines:
+StateMachine = {Name:Mut,Type:int,Value:2}; State: {Name:StateType,Type:main.StateType,Value:B}
+
+QueuedEvents:
+StateMachine << transitionEvent; {Name:To,Type:goat.AbstractState,Value:&{{0} C}}
+StateMachine << entryEvent;" ];
+  15725610466176215872 [ color=red, penwidth=3 ];
+  15781793150171186101 [ label="StateMachines:
+StateMachine = {Name:Mut,Type:int,Value:1}; State: {Name:StateType,Type:main.StateType,Value:A}
+
+QueuedEvents:
+StateMachine << transitionEvent; {Name:To,Type:goat.AbstractState,Value:&{{0} B}}
+StateMachine << entryEvent;" ];
+  857836209921096945 -> 12584546932387734379;
+  1960329270333910849 -> 3987276887090901495;
+  3987276887090901495 -> 15725610466176215872;
+  5277167961608379654 -> 15781793150171186101;
+  12694363019802379037 -> 5277167961608379654;
+  15725610466176215872 -> 857836209921096945;
+  15781793150171186101 -> 1960329270333910849;
+}

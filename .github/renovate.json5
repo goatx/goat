@@ -1,0 +1,48 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:best-practices",
+    ":timezone(Asia/Tokyo)",
+    "helpers:pinGitHubActionDigests"
+  ],
+  "labels": ["dependencies"],
+  "enabledManagers": ["gomod", "github-actions"],
+
+  "github-actions": {
+    "enabled": true,
+    "schedule": ["every weekend"],
+    "minimumReleaseAge": "7 days",
+    "prHourlyLimit": 5,
+    "prConcurrentLimit": 10,
+    "packageRules": [
+      {
+        "matchManagers": ["github-actions"],
+        "matchPaths": [".github/workflows/**"],
+        "groupName": "GitHub Actions",
+        "groupSlug": "github-actions",
+        "matchUpdateTypes": ["minor", "patch"],
+        "reviewers": ["hono0130"]
+      }
+    ]
+  },
+
+  "gomod": {
+    "enabled": true,
+    "schedule": ["every weekend"],
+    "minimumReleaseAge": "7 days",
+    "prHourlyLimit": 5,
+    "prConcurrentLimit": 10,
+    "packageRules": [
+      {
+        "matchManagers": ["gomod"],
+        "matchPaths": ["go.mod"],
+        "matchDatasources": ["go"],
+        "groupName": "Go dependencies",
+        "groupSlug": "go-dependencies",
+        "postUpdateOptions": ["gomodTidy"],
+        "matchUpdateTypes": ["minor", "patch"],
+        "reviewers": ["hono0130"]
+      }
+    ]
+  }
+}
