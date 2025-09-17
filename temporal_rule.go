@@ -67,7 +67,7 @@ func WheneverPEventuallyQ(p, q Condition) TemporalRule {
 		trans: map[baState][]baTransition{
 			0: {
 				{to: 1, cond: func(l map[ConditionName]bool) bool { return l[p.Name()] && !l[q.Name()] }},
-				{to: 0, cond: func(l map[ConditionName]bool) bool { return !(l[p.Name()] && !l[q.Name()]) }},
+				{to: 0, cond: func(l map[ConditionName]bool) bool { return !l[p.Name()] || l[q.Name()] }},
 			},
 			1: {
 				{to: 1, cond: func(l map[ConditionName]bool) bool { return !l[q.Name()] }},

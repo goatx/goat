@@ -76,18 +76,19 @@ func (m *model) checkBA(b *ba) (bool, *lasso) {
 			continue
 		}
 		for _, n := range scc {
-			if b.accepting[n.s] {
-				prefix := buildPrefix(pre, n)
-				sccSet := make(map[prodNode]bool)
-				for _, pn := range scc {
-					sccSet[pn] = true
-				}
-				loop := findCycle(graph, n, sccSet)
-				if loop == nil {
-					loop = []worldID{n.w}
-				}
-				return false, &lasso{Prefix: prefix, Loop: loop}
+			if !b.accepting[n.s] {
+				continue
 			}
+			prefix := buildPrefix(pre, n)
+			sccSet := make(map[prodNode]bool)
+			for _, pn := range scc {
+				sccSet[pn] = true
+			}
+			loop := findCycle(graph, n, sccSet)
+			if loop == nil {
+				loop = []worldID{n.w}
+			}
+			return false, &lasso{Prefix: prefix, Loop: loop}
 		}
 	}
 	return true, nil

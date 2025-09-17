@@ -1,0 +1,55 @@
+digraph {
+  1323071071906196919 [ label="StateMachines:
+StateMachine = no fields; State: {Name:StateType,Type:main.StateType,Value:Pending}
+
+QueuedEvents:
+StateMachine << transitionEvent; {Name:To,Type:goat.AbstractState,Value:&{{0} Paid}}
+StateMachine << entryEvent;" ];
+  5697576419907670381 [ label="StateMachines:
+StateMachine = no fields; State: {Name:StateType,Type:main.StateType,Value:Paid}
+
+QueuedEvents:
+StateMachine << transitionEvent; {Name:To,Type:goat.AbstractState,Value:&{{0} Shipped}}
+StateMachine << entryEvent;" ];
+  6633226742058791819 [ label="StateMachines:
+StateMachine = no fields; State: {Name:StateType,Type:main.StateType,Value:Shipped}
+
+QueuedEvents:" ];
+  7715228447041403726 [ label="StateMachines:
+StateMachine = no fields; State: {Name:StateType,Type:main.StateType,Value:Pending}
+
+QueuedEvents:
+StateMachine << exitEvent;
+StateMachine << transitionEvent; {Name:To,Type:goat.AbstractState,Value:&{{0} Paid}}
+StateMachine << entryEvent;" ];
+  12177598604574514884 [ label="StateMachines:
+StateMachine = no fields; State: {Name:StateType,Type:main.StateType,Value:Pending}
+
+QueuedEvents:
+StateMachine << entryEvent;" ];
+  12177598604574514884 [ penwidth=5 ];
+  12591507039532100162 [ label="StateMachines:
+StateMachine = no fields; State: {Name:StateType,Type:main.StateType,Value:Paid}
+
+QueuedEvents:
+StateMachine << exitEvent;
+StateMachine << transitionEvent; {Name:To,Type:goat.AbstractState,Value:&{{0} Shipped}}
+StateMachine << entryEvent;" ];
+  15120067478055564299 [ label="StateMachines:
+StateMachine = no fields; State: {Name:StateType,Type:main.StateType,Value:Paid}
+
+QueuedEvents:
+StateMachine << entryEvent;" ];
+  15821376834768749708 [ label="StateMachines:
+StateMachine = no fields; State: {Name:StateType,Type:main.StateType,Value:Shipped}
+
+QueuedEvents:
+StateMachine << entryEvent;" ];
+  1323071071906196919 -> 15120067478055564299;
+  5697576419907670381 -> 15821376834768749708;
+  7715228447041403726 -> 1323071071906196919;
+  12177598604574514884 -> 7715228447041403726;
+  12591507039532100162 -> 5697576419907670381;
+  15120067478055564299 -> 12591507039532100162;
+  15821376834768749708 -> 6633226742058791819;
+}

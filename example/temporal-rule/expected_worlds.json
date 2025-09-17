@@ -1,0 +1,426 @@
+[
+  {
+    "invariant_violation": false,
+    "queued_events": [
+      {
+        "details": "no fields",
+        "event_name": "eShipResponse",
+        "target_machine": "Order"
+      }
+    ],
+    "state_machines": [
+      {
+        "details": "no fields",
+        "id": "Order",
+        "name": "Order",
+        "state": "{Name:StateType,Type:main.StateType,Value:Paid}"
+      },
+      {
+        "details": "no fields",
+        "id": "Shipper",
+        "name": "Shipper",
+        "state": "no fields"
+      }
+    ]
+  },
+  {
+    "invariant_violation": false,
+    "queued_events": [
+      {
+        "details": "no fields",
+        "event_name": "entryEvent",
+        "target_machine": "Order"
+      }
+    ],
+    "state_machines": [
+      {
+        "details": "no fields",
+        "id": "Order",
+        "name": "Order",
+        "state": "{Name:StateType,Type:main.StateType,Value:Paid}"
+      },
+      {
+        "details": "no fields",
+        "id": "Shipper",
+        "name": "Shipper",
+        "state": "no fields"
+      }
+    ]
+  },
+  {
+    "invariant_violation": false,
+    "queued_events": [
+      {
+        "details": "no fields",
+        "event_name": "entryEvent",
+        "target_machine": "Order"
+      },
+      {
+        "details": "no fields",
+        "event_name": "exitEvent",
+        "target_machine": "Order"
+      },
+      {
+        "details": "{Name:To,Type:goat.AbstractState,Value:\u0026{{0} Shipped}}",
+        "event_name": "transitionEvent",
+        "target_machine": "Order"
+      }
+    ],
+    "state_machines": [
+      {
+        "details": "no fields",
+        "id": "Order",
+        "name": "Order",
+        "state": "{Name:StateType,Type:main.StateType,Value:Paid}"
+      },
+      {
+        "details": "no fields",
+        "id": "Shipper",
+        "name": "Shipper",
+        "state": "no fields"
+      }
+    ]
+  },
+  {
+    "invariant_violation": false,
+    "queued_events": [
+      {
+        "details": "no fields",
+        "event_name": "entryEvent",
+        "target_machine": "Order"
+      },
+      {
+        "details": "{Name:To,Type:goat.AbstractState,Value:\u0026{{0} Shipped}}",
+        "event_name": "transitionEvent",
+        "target_machine": "Order"
+      }
+    ],
+    "state_machines": [
+      {
+        "details": "no fields",
+        "id": "Order",
+        "name": "Order",
+        "state": "{Name:StateType,Type:main.StateType,Value:Paid}"
+      },
+      {
+        "details": "no fields",
+        "id": "Shipper",
+        "name": "Shipper",
+        "state": "no fields"
+      }
+    ]
+  },
+  {
+    "invariant_violation": false,
+    "queued_events": [
+      {
+        "details": "no fields",
+        "event_name": "entryEvent",
+        "target_machine": "Order"
+      },
+      {
+        "details": "no fields",
+        "event_name": "entryEvent",
+        "target_machine": "Shipper"
+      }
+    ],
+    "state_machines": [
+      {
+        "details": "no fields",
+        "id": "Order",
+        "name": "Order",
+        "state": "{Name:StateType,Type:main.StateType,Value:Paid}"
+      },
+      {
+        "details": "no fields",
+        "id": "Shipper",
+        "name": "Shipper",
+        "state": "no fields"
+      }
+    ]
+  },
+  {
+    "invariant_violation": false,
+    "queued_events": [
+      {
+        "details": "no fields",
+        "event_name": "eShipRequest",
+        "target_machine": "Shipper"
+      }
+    ],
+    "state_machines": [
+      {
+        "details": "no fields",
+        "id": "Order",
+        "name": "Order",
+        "state": "{Name:StateType,Type:main.StateType,Value:Paid}"
+      },
+      {
+        "details": "no fields",
+        "id": "Shipper",
+        "name": "Shipper",
+        "state": "no fields"
+      }
+    ]
+  },
+  {
+    "invariant_violation": false,
+    "queued_events": [
+      {
+        "details": "no fields",
+        "event_name": "eShipRequest",
+        "target_machine": "Shipper"
+      },
+      {
+        "details": "no fields",
+        "event_name": "entryEvent",
+        "target_machine": "Shipper"
+      }
+    ],
+    "state_machines": [
+      {
+        "details": "no fields",
+        "id": "Order",
+        "name": "Order",
+        "state": "{Name:StateType,Type:main.StateType,Value:Paid}"
+      },
+      {
+        "details": "no fields",
+        "id": "Shipper",
+        "name": "Shipper",
+        "state": "no fields"
+      }
+    ]
+  },
+  {
+    "invariant_violation": false,
+    "queued_events": [
+      {
+        "details": "no fields",
+        "event_name": "entryEvent",
+        "target_machine": "Order"
+      }
+    ],
+    "state_machines": [
+      {
+        "details": "no fields",
+        "id": "Order",
+        "name": "Order",
+        "state": "{Name:StateType,Type:main.StateType,Value:Pending}"
+      },
+      {
+        "details": "no fields",
+        "id": "Shipper",
+        "name": "Shipper",
+        "state": "no fields"
+      }
+    ]
+  },
+  {
+    "invariant_violation": false,
+    "queued_events": [
+      {
+        "details": "no fields",
+        "event_name": "entryEvent",
+        "target_machine": "Order"
+      },
+      {
+        "details": "no fields",
+        "event_name": "exitEvent",
+        "target_machine": "Order"
+      },
+      {
+        "details": "{Name:To,Type:goat.AbstractState,Value:\u0026{{0} Paid}}",
+        "event_name": "transitionEvent",
+        "target_machine": "Order"
+      }
+    ],
+    "state_machines": [
+      {
+        "details": "no fields",
+        "id": "Order",
+        "name": "Order",
+        "state": "{Name:StateType,Type:main.StateType,Value:Pending}"
+      },
+      {
+        "details": "no fields",
+        "id": "Shipper",
+        "name": "Shipper",
+        "state": "no fields"
+      }
+    ]
+  },
+  {
+    "invariant_violation": false,
+    "queued_events": [
+      {
+        "details": "no fields",
+        "event_name": "entryEvent",
+        "target_machine": "Order"
+      },
+      {
+        "details": "no fields",
+        "event_name": "exitEvent",
+        "target_machine": "Order"
+      },
+      {
+        "details": "{Name:To,Type:goat.AbstractState,Value:\u0026{{0} Paid}}",
+        "event_name": "transitionEvent",
+        "target_machine": "Order"
+      },
+      {
+        "details": "no fields",
+        "event_name": "entryEvent",
+        "target_machine": "Shipper"
+      }
+    ],
+    "state_machines": [
+      {
+        "details": "no fields",
+        "id": "Order",
+        "name": "Order",
+        "state": "{Name:StateType,Type:main.StateType,Value:Pending}"
+      },
+      {
+        "details": "no fields",
+        "id": "Shipper",
+        "name": "Shipper",
+        "state": "no fields"
+      }
+    ]
+  },
+  {
+    "invariant_violation": false,
+    "queued_events": [
+      {
+        "details": "no fields",
+        "event_name": "entryEvent",
+        "target_machine": "Order"
+      },
+      {
+        "details": "{Name:To,Type:goat.AbstractState,Value:\u0026{{0} Paid}}",
+        "event_name": "transitionEvent",
+        "target_machine": "Order"
+      }
+    ],
+    "state_machines": [
+      {
+        "details": "no fields",
+        "id": "Order",
+        "name": "Order",
+        "state": "{Name:StateType,Type:main.StateType,Value:Pending}"
+      },
+      {
+        "details": "no fields",
+        "id": "Shipper",
+        "name": "Shipper",
+        "state": "no fields"
+      }
+    ]
+  },
+  {
+    "invariant_violation": false,
+    "queued_events": [
+      {
+        "details": "no fields",
+        "event_name": "entryEvent",
+        "target_machine": "Order"
+      },
+      {
+        "details": "{Name:To,Type:goat.AbstractState,Value:\u0026{{0} Paid}}",
+        "event_name": "transitionEvent",
+        "target_machine": "Order"
+      },
+      {
+        "details": "no fields",
+        "event_name": "entryEvent",
+        "target_machine": "Shipper"
+      }
+    ],
+    "state_machines": [
+      {
+        "details": "no fields",
+        "id": "Order",
+        "name": "Order",
+        "state": "{Name:StateType,Type:main.StateType,Value:Pending}"
+      },
+      {
+        "details": "no fields",
+        "id": "Shipper",
+        "name": "Shipper",
+        "state": "no fields"
+      }
+    ]
+  },
+  {
+    "invariant_violation": false,
+    "queued_events": [
+      {
+        "details": "no fields",
+        "event_name": "entryEvent",
+        "target_machine": "Order"
+      },
+      {
+        "details": "no fields",
+        "event_name": "entryEvent",
+        "target_machine": "Shipper"
+      }
+    ],
+    "state_machines": [
+      {
+        "details": "no fields",
+        "id": "Order",
+        "name": "Order",
+        "state": "{Name:StateType,Type:main.StateType,Value:Pending}"
+      },
+      {
+        "details": "no fields",
+        "id": "Shipper",
+        "name": "Shipper",
+        "state": "no fields"
+      }
+    ]
+  },
+  {
+    "invariant_violation": false,
+    "queued_events": [],
+    "state_machines": [
+      {
+        "details": "no fields",
+        "id": "Order",
+        "name": "Order",
+        "state": "{Name:StateType,Type:main.StateType,Value:Shipped}"
+      },
+      {
+        "details": "no fields",
+        "id": "Shipper",
+        "name": "Shipper",
+        "state": "no fields"
+      }
+    ]
+  },
+  {
+    "invariant_violation": false,
+    "queued_events": [
+      {
+        "details": "no fields",
+        "event_name": "entryEvent",
+        "target_machine": "Order"
+      }
+    ],
+    "state_machines": [
+      {
+        "details": "no fields",
+        "id": "Order",
+        "name": "Order",
+        "state": "{Name:StateType,Type:main.StateType,Value:Shipped}"
+      },
+      {
+        "details": "no fields",
+        "id": "Shipper",
+        "name": "Shipper",
+        "state": "no fields"
+      }
+    ]
+  }
+]
