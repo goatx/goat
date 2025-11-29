@@ -8,13 +8,21 @@ import (
 	"github.com/goatx/goat"
 )
 
-type ProtobufResponse[O AbstractProtobufMessage] struct {
+// ProtobufResponse represents a response that will be sent back in a Protobuf RPC handler.
+// You must create this by calling ProtobufSendTo with your response message.
+type ProtobufResponse[O AbstractProtobufMessage] interface {
+	protobufResponse()
+}
+
+type protobufResponseImpl[O AbstractProtobufMessage] struct {
 	event O
 }
 
+func (r protobufResponseImpl[O]) protobufResponse() {}
+
 func ProtobufSendTo[O AbstractProtobufMessage](ctx context.Context, target goat.AbstractStateMachine, event O) ProtobufResponse[O] {
 	goat.SendTo(ctx, target, event)
-	return ProtobufResponse[O]{event: event}
+	return protobufResponseImpl[O]{event: event}
 }
 
 func NewProtobufServiceSpec[T goat.AbstractStateMachine](prototype T) *ProtobufServiceSpec[T] {
