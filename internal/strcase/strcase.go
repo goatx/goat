@@ -1,6 +1,9 @@
 package strcase
 
-import "unicode"
+import (
+	"strings"
+	"unicode"
+)
 
 func ToCamelCase(name string) string {
 	if name == "" {
@@ -29,10 +32,10 @@ func ToSnakeCase(s string) string {
 				prev := runes[i-1]
 				nextLower := false
 				if i < len(runes)-1 {
-					nextLower = unicode.IsLower(runes[i+1]) || unicode.IsDigit(runes[i+1])
+					nextLower = unicode.IsLower(runes[i+1])
 				}
 
-				if unicode.IsLower(prev) || unicode.IsDigit(prev) || nextLower {
+				if unicode.IsLower(prev) || nextLower {
 					result = append(result, '_')
 				}
 			}
@@ -43,4 +46,17 @@ func ToSnakeCase(s string) string {
 	}
 
 	return string(result)
+}
+
+func ToProtobufFieldName(s string) string {
+	snake := ToSnakeCase(s)
+	parts := strings.Split(snake, "_")
+	var result strings.Builder
+	for _, part := range parts {
+		if part != "" {
+			result.WriteString(strings.ToUpper(string(part[0])))
+			result.WriteString(part[1:])
+		}
+	}
+	return result.String()
 }

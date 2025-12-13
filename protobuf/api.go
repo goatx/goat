@@ -13,6 +13,10 @@ type Response[O AbstractMessage] struct {
 	event O
 }
 
+func (r Response[O]) getEvent() AbstractMessage {
+	return r.event
+}
+
 func SendTo[O AbstractMessage](ctx context.Context, target goat.AbstractStateMachine, event O) Response[O] {
 	goat.SendTo(ctx, target, event)
 	return Response[O]{event: event}
@@ -23,6 +27,7 @@ func NewServiceSpec[T goat.AbstractStateMachine](prototype T) *ServiceSpec[T] {
 		StateMachineSpec: goat.NewStateMachineSpec(prototype),
 		rpcMethods:       []rpcMethod{},
 		messages:         make(map[string]*message),
+		handlers:         make(map[string]handlerFunc),
 	}
 }
 
@@ -35,7 +40,7 @@ func OnMessage[T goat.AbstractStateMachine, I AbstractMessage, O AbstractMessage
 	inputEvent := newMessagePrototype[I]()
 	outputEvent := newMessagePrototype[O]()
 
-	serviceTypeName := getServiceTypeName(spec.StateMachineSpec)
+	serviceTypeName := spec.getServiceName()
 	inputTypeName := getEventTypeName(inputEvent)
 	outputTypeName := getEventTypeName(outputEvent)
 
@@ -52,6 +57,10 @@ func OnMessage[T goat.AbstractStateMachine, I AbstractMessage, O AbstractMessage
 	outputMsg := analyzeMessage(outputEvent)
 	spec.addMessage(inputMsg)
 	spec.addMessage(outputMsg)
+
+	spec.handlers[methodName] = func(ctx context.Context, input AbstractMessage, sm goat.AbstractStateMachine) AbstractMessage {
+		return handler(ctx, input.(I), sm.(T)).getEvent()
+	}
 
 	wrappedHandler := func(ctx context.Context, event I, sm T) {
 		response := handler(ctx, event, sm)
@@ -106,13 +115,10 @@ func analyzeMessage[M AbstractMessage](instance M) *message {
 	for i := 0; i < msgType.NumField(); i++ {
 		f := msgType.Field(i)
 
-		if !f.IsExported() {
+		if !f.IsExported() || f.Name == "_" {
 			continue
 		}
-		if f.Type == reflect.TypeOf(Message[goat.AbstractStateMachine, goat.AbstractStateMachine]{}) {
-			continue
-		}
-		if f.Name == "_" {
+		if typeutil.IsEventType(f.Type) || isMessageType(f.Type) {
 			continue
 		}
 
@@ -177,11 +183,6 @@ func Generate(opts GenerateOptions, specs ...AbstractServiceSpec) error {
 
 	generator := newGenerator(opts)
 	return generator.generateFromSpecs(specs...)
-}
-
-func getServiceTypeName[T goat.AbstractStateMachine](_ *goat.StateMachineSpec[T]) string {
-	var zero T
-	return typeutil.Name(zero)
 }
 
 func getEventTypeName[E AbstractMessage](event E) string {
