@@ -43,8 +43,8 @@ func (a *typeAnalyzer) analyzeSpecs(specs ...AbstractServiceSpec) *definitions {
 		service := a.analyzeServiceSpecInterface(spec)
 		definitions.Services = append(definitions.Services, service)
 
-		messages := make([]*message, 0, len(spec.GetMessages()))
-		for _, message := range spec.GetMessages() {
+		messages := make([]*message, 0, len(spec.getMessages()))
+		for _, message := range spec.getMessages() {
 			messages = append(messages, message)
 		}
 		sort.Slice(messages, func(i, j int) bool {
@@ -58,7 +58,7 @@ func (a *typeAnalyzer) analyzeSpecs(specs ...AbstractServiceSpec) *definitions {
 }
 
 func (*typeAnalyzer) analyzeServiceSpecInterface(spec AbstractServiceSpec) *service {
-	rpcMethods := spec.GetRPCMethods()
+	rpcMethods := spec.getRPCMethods()
 
 	serviceName := ""
 	if len(rpcMethods) > 0 {

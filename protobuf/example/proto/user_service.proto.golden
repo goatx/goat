@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package user.service;
 
-option go_package = "github.com/goatx/goat/user/proto";
+option go_package = "github.com/goatx/goat/protobuf/example/proto";
 
 message CreateUserRequest {
   string username = 1;

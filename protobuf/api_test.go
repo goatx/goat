@@ -42,14 +42,14 @@ func TestOnMessage(t *testing.T) {
 			state := &TestIdleState{}
 			spec.DefineStates(state).SetInitialState(state)
 
-			initialMethodCount := len(spec.GetRPCMethods())
+			initialMethodCount := len(spec.getRPCMethods())
 
 			OnMessage(spec, state, tt.methodName,
 				func(ctx context.Context, event *TestRequest1, sm *TestService1) Response[*TestResponse1] {
 					return SendTo(ctx, sm, &TestResponse1{Result: "test"})
 				})
 
-			methods := spec.GetRPCMethods()
+			methods := spec.getRPCMethods()
 			if len(methods) != initialMethodCount+1 {
 				t.Fatalf("expected %d method(s), got %d", initialMethodCount+1, len(methods))
 			}
@@ -62,7 +62,7 @@ func TestOnMessage(t *testing.T) {
 				t.Fatal("StateMachineSpec should not be nil after OnMessage call")
 			}
 
-			if len(spec.GetRPCMethods()) == 0 {
+			if len(spec.getRPCMethods()) == 0 {
 				t.Error("RPC methods should be registered after OnMessage call")
 			}
 		})

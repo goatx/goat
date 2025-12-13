@@ -1,0 +1,41 @@
+package main
+
+import (
+	"log"
+	"net"
+	"os"
+	"testing"
+
+	pbuser_service "github.com/goatx/goat/protobuf/example/proto"
+	"google.golang.org/grpc"
+)
+
+var user_serviceClient pbuser_service.UserServiceClient
+
+func TestMain(m *testing.M) {
+	lis0, err := net.Listen("tcp", "localhost:0")
+	if err != nil {
+		log.Fatalf("Failed to listen: %v", err)
+	}
+
+	grpcServer0 := grpc.NewServer()
+	defer grpcServer0.Stop()
+	// TODO: Register your service implementation here
+	// pbuser_service.RegisterUserServiceServer(grpcServer0, &yourServiceImplementation{})
+
+	go func() {
+		if err := grpcServer0.Serve(lis0); err != nil {
+			log.Fatalf("Failed to serve: %v", err)
+		}
+	}()
+
+	conn0, err := grpc.Dial(lis0.Addr().String(), grpc.WithInsecure())
+	if err != nil {
+		log.Fatalf("Failed to dial: %v", err)
+	}
+	defer conn0.Close()
+
+	user_serviceClient = pbuser_service.NewUserServiceClient(conn0)
+
+	os.Exit(m.Run())
+}
