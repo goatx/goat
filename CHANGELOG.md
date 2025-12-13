@@ -1,5 +1,33 @@
 # Changelog
 
+## [0.5.0](https://github.com/goatx/goat/releases/tag/v0.5.0) - 2025-12-13
+
+### Added
+- OpenAPI schema generation support
+  - New `openapi` package for generating OpenAPI 3.0 specifications from Go state machines
+  - Support for request/response schema generation with `AbstractSchema` interface
+  - HTTP method mapping (GET, POST, PUT, DELETE, PATCH) with status code configuration
+  - Request/response body and path parameter type definitions
+  - Automatic schema reference generation and validation
+- E2E test generation for Protocol Buffer services
+  - New `GenerateE2ETestSuite` function to generate complete test suites
+  - Automatic generation of `main_test.go` with test infrastructure
+  - Service-specific test file generation with method test cases
+  - Support for custom test input scenarios via `MethodTestCase`
+- New internal utility packages
+
+### Changed
+- Refactored API naming for OpenAPI and Protocol Buffer packages
+- Updated test golden files to use `.golden` extension
+
+### Dependencies
+- Updated `actions/checkout` to v6
+- Updated `golangci/golangci-lint-action` to v9
+- Updated various GitHub Actions workflows
+
+### Fixed
+- Disabled repository checkout in govulncheck action to improve CI performance
+
 ## [0.4.0](https://github.com/goatx/goat/releases/tag/v0.4.0) - 2025-11-07
 
 ### Changed
