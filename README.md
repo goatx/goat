@@ -108,6 +108,8 @@ server, _ := serverSpec.NewInstance()
 client.Server = server
 ```
 
+Pointer fields like `Server *Server` serve as references to other machines and are not included in state comparison or verification. Do not use pointer fields for domain data. Fields of type `int`, `string`, `map`, `slice`, and structs work.
+
 ### Defining Rules
 
 A **condition** is a named boolean check on one or more state machines. A **rule** takes a condition and specifies how to verify it — always true, eventually true, and so on.

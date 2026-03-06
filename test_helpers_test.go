@@ -20,6 +20,7 @@ type genericTestEvent[T any] struct {
 }
 
 const testStateMachineID = "testStateMachine"
+const testModifiedValue = "modified"
 
 func newTestState(name string) *testState {
 	return &testState{Name: name}

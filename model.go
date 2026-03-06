@@ -3,6 +3,7 @@ package goat
 import (
 	"fmt"
 	"hash/fnv"
+	stdos "os"
 	"sort"
 	"strconv"
 	"strings"
@@ -181,6 +182,7 @@ func newModel(opts ...Option) (model, error) {
 	if len(os.sms) == 0 {
 		return model{}, fmt.Errorf("no state machines provided")
 	}
+	warnShallowPointerFields(stdos.Stderr, os.sms)
 	initial := initialWorld(os.sms...)
 	m := model{
 		initial:    initial,

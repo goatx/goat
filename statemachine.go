@@ -185,18 +185,6 @@ func (*State) isState() bool {
 	return true
 }
 
-func cloneState(state AbstractState) AbstractState {
-	v := reflect.ValueOf(state)
-	if v.Kind() == reflect.Ptr {
-		v = v.Elem()
-	}
-
-	newState := reflect.New(v.Type()).Elem()
-	newState.Set(v)
-
-	return newState.Addr().Interface().(AbstractState)
-}
-
 func sameState(s1, s2 AbstractState) bool {
 	return getStateDetails(s1) == getStateDetails(s2)
 }
@@ -246,40 +234,6 @@ type StateMachine struct {
 	HandlerBuilders map[AbstractState][]handlerBuilderInfo
 	halted          bool
 	State           AbstractState
-}
-
-func cloneStateMachine(sm AbstractStateMachine) AbstractStateMachine {
-	v := reflect.ValueOf(sm)
-	if v.Kind() == reflect.Ptr {
-		v = v.Elem()
-	}
-
-	smc := reflect.New(v.Type()).Elem()
-
-	smc.Set(v)
-
-	currentStateField := smc.FieldByName("State")
-	if currentStateField.IsValid() && !currentStateField.IsZero() {
-		state := currentStateField.Interface().(AbstractState)
-		currentStateField.Set(reflect.ValueOf(cloneState(state)))
-	}
-
-	eventHandlersField := smc.FieldByName("EventHandlers")
-	if eventHandlersField.IsValid() && !eventHandlersField.IsZero() {
-		oldHandlers := eventHandlersField.Interface().(map[AbstractState][]handlerInfo)
-		newHandlers := make(map[AbstractState][]handlerInfo, len(oldHandlers))
-
-		for state, handlers := range oldHandlers {
-			newState := cloneState(state)
-			// NITS: this is a shallow copy,
-			// but it's fine since we don't expect the handlers to be mutated
-			newHandlers[newState] = append([]handlerInfo{}, handlers...)
-		}
-
-		eventHandlersField.Set(reflect.ValueOf(newHandlers))
-	}
-
-	return smc.Addr().Interface().(AbstractStateMachine)
 }
 
 func (*StateMachine) isStateMachine() bool {

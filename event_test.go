@@ -1,7 +1,6 @@
 package goat
 
 import (
-	"reflect"
 	"testing"
 )
 
@@ -12,96 +11,6 @@ type testEventWithPointer struct {
 
 type testStruct struct {
 	value int
-}
-
-func TestCloneEvent(t *testing.T) {
-	tests := []struct {
-		name     string
-		original AbstractEvent
-		setup    func(AbstractEvent)
-		validate func(*testing.T, AbstractEvent)
-	}{
-		{
-			name:     "testEvent",
-			original: &testEvent{Value: 42},
-		},
-		{
-			name:     "entryEvent",
-			original: &entryEvent{},
-		},
-		{
-			name:     "exitEvent",
-			original: &exitEvent{},
-		},
-		{
-			name:     "haltEvent",
-			original: &haltEvent{},
-		},
-		{
-			name:     "transitionEvent",
-			original: &transitionEvent{To: &testState{Name: "target"}},
-		},
-		{
-			name:     "testEventWithPointer",
-			original: &testEventWithPointer{ptr: &testStruct{value: 100}},
-		},
-		func() struct {
-			name     string
-			original AbstractEvent
-			setup    func(AbstractEvent)
-			validate func(*testing.T, AbstractEvent)
-		} {
-			sender := newTestStateMachine(newTestState("sender"))
-			recipient := newTestStateMachine(newTestState("recipient"))
-			return struct {
-				name     string
-				original AbstractEvent
-				setup    func(AbstractEvent)
-				validate func(*testing.T, AbstractEvent)
-			}{
-				name:     "preserves routing metadata",
-				original: &testEvent{Value: 10},
-				setup: func(ev AbstractEvent) {
-					ev.(*testEvent).setRoutingInfo(sender, recipient)
-				},
-				validate: func(t *testing.T, cloned AbstractEvent) {
-					clonedEvent := cloned.(*testEvent)
-					if clonedEvent.Sender() != sender {
-						t.Errorf("expected cloned sender %p, got %p", sender, clonedEvent.Sender())
-					}
-					if clonedEvent.Recipient() != recipient {
-						t.Errorf("expected cloned recipient %p, got %p", recipient, clonedEvent.Recipient())
-					}
-				},
-			}
-		}(),
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if tt.setup != nil {
-				tt.setup(tt.original)
-			}
-
-			cloned := cloneEvent(tt.original)
-
-			if reflect.ValueOf(tt.original).Pointer() == reflect.ValueOf(cloned).Pointer() {
-				t.Errorf("Expected different pointer addresses, but got the same: %p", tt.original)
-			}
-
-			if reflect.TypeOf(tt.original) != reflect.TypeOf(cloned) {
-				t.Errorf("Expected same type, but got different: %T vs %T", tt.original, cloned)
-			}
-
-			if !reflect.DeepEqual(tt.original, cloned) {
-				t.Errorf("Expected original and cloned events to be equal, but they are not: %v vs %v", tt.original, cloned)
-			}
-
-			if tt.validate != nil {
-				tt.validate(t, cloned)
-			}
-		})
-	}
 }
 
 func TestEvent_Sender(t *testing.T) {

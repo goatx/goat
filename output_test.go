@@ -693,3 +693,178 @@ func TestModel_summarize(t *testing.T) {
 		})
 	}
 }
+
+type smWithGoatPointer struct {
+	StateMachine
+	Other *testStateMachine
+}
+
+type smWithDomainPointer struct {
+	StateMachine
+	Data *int
+}
+
+type smWithUnexportedPointer struct {
+	StateMachine
+	data *int //nolint:unused // field existence is the test target
+}
+
+type stateWithPointer struct {
+	State
+	Data *int
+}
+
+type eventWithPointer struct {
+	Event[*testStateMachine, *testStateMachine]
+	Data *int
+}
+
+type myDomainStruct struct {
+	Value int
+}
+
+type smWithDomainStructPointer struct {
+	StateMachine
+	Info *myDomainStruct
+}
+
+type innerWithPointer struct {
+	Ptr *int
+}
+
+type smWithNestedPointer struct {
+	StateMachine
+	Inner innerWithPointer
+}
+
+func TestWarnShallowPointerFields(t *testing.T) {
+	tests := []struct {
+		name  string
+		setup func() []AbstractStateMachine
+		want  string
+	}{
+		{
+			name: "AbstractStateMachine pointer field is allowed",
+			setup: func() []AbstractStateMachine {
+				spec := NewStateMachineSpec(&smWithGoatPointer{})
+				spec.DefineStates(newTestState("s")).SetInitialState(newTestState("s"))
+				sm, err := spec.NewInstance()
+				if err != nil {
+					panic(err)
+				}
+				return []AbstractStateMachine{sm}
+			},
+			want: "",
+		},
+		{
+			name: "domain pointer field warns",
+			setup: func() []AbstractStateMachine {
+				spec := NewStateMachineSpec(&smWithDomainPointer{})
+				spec.DefineStates(newTestState("s")).SetInitialState(newTestState("s"))
+				sm, err := spec.NewInstance()
+				if err != nil {
+					panic(err)
+				}
+				return []AbstractStateMachine{sm}
+			},
+			want: "WARNING: type \"smWithDomainPointer\" has pointer field \"Data\" (*int) which will be shared between states during model checking, potentially causing incorrect results. Consider using a value type instead.\n",
+		},
+		{
+			name: "unexported pointer field does not warn",
+			setup: func() []AbstractStateMachine {
+				spec := NewStateMachineSpec(&smWithUnexportedPointer{})
+				spec.DefineStates(newTestState("s")).SetInitialState(newTestState("s"))
+				sm, err := spec.NewInstance()
+				if err != nil {
+					panic(err)
+				}
+				return []AbstractStateMachine{sm}
+			},
+			want: "",
+		},
+		{
+			name: "same type checked only once",
+			setup: func() []AbstractStateMachine {
+				spec := NewStateMachineSpec(&smWithDomainPointer{})
+				spec.DefineStates(newTestState("s")).SetInitialState(newTestState("s"))
+				sm1, err := spec.NewInstance()
+				if err != nil {
+					panic(err)
+				}
+				sm2, err := spec.NewInstance()
+				if err != nil {
+					panic(err)
+				}
+				return []AbstractStateMachine{sm1, sm2}
+			},
+			want: "WARNING: type \"smWithDomainPointer\" has pointer field \"Data\" (*int) which will be shared between states during model checking, potentially causing incorrect results. Consider using a value type instead.\n",
+		},
+		{
+			name: "state pointer field warns",
+			setup: func() []AbstractStateMachine {
+				spec := NewStateMachineSpec(&testStateMachine{})
+				s := &stateWithPointer{}
+				spec.DefineStates(s).SetInitialState(s)
+				sm, err := spec.NewInstance()
+				if err != nil {
+					panic(err)
+				}
+				return []AbstractStateMachine{sm}
+			},
+			want: "WARNING: type \"stateWithPointer\" has pointer field \"Data\" (*int) which will be shared between states during model checking, potentially causing incorrect results. Consider using a value type instead.\n",
+		},
+		{
+			name: "event pointer field warns",
+			setup: func() []AbstractStateMachine {
+				spec := NewStateMachineSpec(&testStateMachine{})
+				s := newTestState("s")
+				spec.DefineStates(s).SetInitialState(s)
+				OnEvent[*eventWithPointer](spec, s, func(ctx context.Context, event *eventWithPointer, sm *testStateMachine) {})
+				sm, err := spec.NewInstance()
+				if err != nil {
+					panic(err)
+				}
+				return []AbstractStateMachine{sm}
+			},
+			want: "WARNING: type \"eventWithPointer\" has pointer field \"Data\" (*int) which will be shared between states during model checking, potentially causing incorrect results. Consider using a value type instead.\n",
+		},
+		{
+			name: "domain struct pointer field warns",
+			setup: func() []AbstractStateMachine {
+				spec := NewStateMachineSpec(&smWithDomainStructPointer{})
+				spec.DefineStates(newTestState("s")).SetInitialState(newTestState("s"))
+				sm, err := spec.NewInstance()
+				if err != nil {
+					panic(err)
+				}
+				return []AbstractStateMachine{sm}
+			},
+			want: "WARNING: type \"smWithDomainStructPointer\" has pointer field \"Info\" (*goat.myDomainStruct) which will be shared between states during model checking, potentially causing incorrect results. Consider using a value type instead.\n",
+		},
+		{
+			name: "nested struct with pointer field warns",
+			setup: func() []AbstractStateMachine {
+				spec := NewStateMachineSpec(&smWithNestedPointer{})
+				spec.DefineStates(newTestState("s")).SetInitialState(newTestState("s"))
+				sm, err := spec.NewInstance()
+				if err != nil {
+					panic(err)
+				}
+				return []AbstractStateMachine{sm}
+			},
+			want: "WARNING: type \"innerWithPointer\" has pointer field \"Ptr\" (*int) which will be shared between states during model checking, potentially causing incorrect results. Consider using a value type instead.\n",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var buf bytes.Buffer
+			warnShallowPointerFields(&buf, tt.setup())
+			got := buf.String()
+
+			if got != tt.want {
+				t.Errorf("warnShallowPointerFields() output mismatch\ngot:\n%s\nwant:\n%s", got, tt.want)
+			}
+		})
+	}
+}
