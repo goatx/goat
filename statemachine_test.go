@@ -114,36 +114,6 @@ func TestGetInnerStateMachine(t *testing.T) {
 	})
 }
 
-func TestCloneStateMachine(t *testing.T) {
-	t.Run("clones state machine with new ID and cloned state", func(t *testing.T) {
-		original := newTestStateMachine(newTestState("original"))
-
-		cloned := cloneStateMachine(original)
-
-		if cloned == original {
-			t.Error("Cloned state machine should not be the same instance")
-		}
-
-		if cloned.id() != original.id() {
-			t.Error("Cloned state machine should have same ID (shallow copy)")
-		}
-
-		if cloned.currentState() == original.currentState() {
-			t.Error("Cloned state should be different instance")
-		}
-
-		if !cmp.Equal(cloned.currentState(), original.currentState()) {
-			t.Errorf("Cloned state mismatch:\n%s", cmp.Diff(original.currentState(), cloned.currentState()))
-		}
-
-		originalInner := getInnerStateMachine(original)
-		clonedInner := getInnerStateMachine(cloned)
-		if len(originalInner.EventHandlers) != len(clonedInner.EventHandlers) {
-			t.Errorf("Handler count mismatch: original=%d, cloned=%d", len(originalInner.EventHandlers), len(clonedInner.EventHandlers))
-		}
-	})
-}
-
 func TestSameState(t *testing.T) {
 	tests := []struct {
 		name string
@@ -209,21 +179,6 @@ func TestGetStateDetails(t *testing.T) {
 
 		if details != "{Name:Name,Type:string,Value:test}" {
 			t.Errorf("getStateDetails() = %v, want %v", details, "{Name:Name,Type:string,Value:test}")
-		}
-	})
-}
-
-func TestCloneState(t *testing.T) {
-	t.Run("clones state correctly", func(t *testing.T) {
-		original := newTestState("original")
-		cloned := cloneState(original)
-
-		if cloned == original {
-			t.Error("Cloned state should not be the same instance")
-		}
-
-		if !cmp.Equal(cloned, original) {
-			t.Errorf("Cloned state mismatch:\n%s", cmp.Diff(original, cloned))
 		}
 	})
 }

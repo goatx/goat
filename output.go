@@ -3,6 +3,7 @@ package goat
 import (
 	"fmt"
 	"io"
+	"reflect"
 	"slices"
 	"sort"
 	"strings"
@@ -28,18 +29,18 @@ func (m *model) writeDot(w io.Writer) {
 	for _, id := range worldIDs {
 		wld := m.worlds[id]
 		sb.WriteString("  ")
-		sb.WriteString(fmt.Sprintf("%d", id))
+		fmt.Fprintf(&sb, "%d", id)
 		sb.WriteString(` [ label="`)
 		sb.WriteString(wld.label())
 		sb.WriteString("\" ];\n")
 		if id == m.initial.id {
 			sb.WriteString("  ")
-			sb.WriteString(fmt.Sprintf("%d", id))
+			fmt.Fprintf(&sb, "%d", id)
 			sb.WriteString(" [ penwidth=5 ];\n")
 		}
 		if len(wld.failedInvariants) > 0 {
 			sb.WriteString("  ")
-			sb.WriteString(fmt.Sprintf("%d", id))
+			fmt.Fprintf(&sb, "%d", id)
 			sb.WriteString(" [ color=red, penwidth=3 ];\n")
 		}
 	}
@@ -59,7 +60,7 @@ func (m *model) writeDot(w io.Writer) {
 			sb.WriteString("  ")
 			sb.WriteString(fromStr)
 			sb.WriteString(" -> ")
-			sb.WriteString(fmt.Sprintf("%d", to))
+			fmt.Fprintf(&sb, "%d", to)
 			sb.WriteString(";\n")
 		}
 	}
@@ -87,7 +88,7 @@ func (m *model) writeInvariantViolations(w io.Writer) {
 		}
 
 		sb.WriteString("Path (length = ")
-		sb.WriteString(fmt.Sprintf("%d", len(violation.path)))
+		fmt.Fprintf(&sb, "%d", len(violation.path))
 		sb.WriteString("):\n")
 
 		m.writeWorldSequence(&sb, violation.path, func(idx int, w world) string {
@@ -149,7 +150,7 @@ func (m *model) writeTemporalViolations(w io.Writer, results []temporalRuleResul
 		}
 
 		sb.WriteString("Violation path (length = ")
-		sb.WriteString(fmt.Sprintf("%d", len(sequence)))
+		fmt.Fprintf(&sb, "%d", len(sequence))
 		sb.WriteString("):\n")
 
 		m.writeWorldSequence(&sb, sequence, nil)
@@ -431,4 +432,67 @@ func (m *model) summarize(executionTimeMs int64) *modelSummary {
 		ExecutionTimeMs: executionTimeMs,
 	}
 	return summary
+}
+
+var (
+	abstractStateMachineType = reflect.TypeOf((*AbstractStateMachine)(nil)).Elem()
+	abstractEventType        = reflect.TypeOf((*AbstractEvent)(nil)).Elem()
+	abstractStateType        = reflect.TypeOf((*AbstractState)(nil)).Elem()
+)
+
+func isGoatInterface(t reflect.Type) bool {
+	return t.Implements(abstractStateMachineType) ||
+		t.Implements(abstractEventType) ||
+		t.Implements(abstractStateType)
+}
+
+func warnShallowPointerFields(w io.Writer, sms []AbstractStateMachine) {
+	checked := make(map[reflect.Type]bool)
+	var checkType func(t reflect.Type)
+	checkType = func(t reflect.Type) {
+		if t.Kind() == reflect.Ptr {
+			t = t.Elem()
+		}
+		if checked[t] {
+			return
+		}
+		checked[t] = true
+
+		if t.Kind() != reflect.Struct {
+			return
+		}
+
+		for i := 0; i < t.NumField(); i++ {
+			f := t.Field(i)
+			if !f.IsExported() {
+				continue
+			}
+			switch f.Type.Kind() {
+			case reflect.Ptr:
+				if isGoatInterface(f.Type) || isGoatInterface(f.Type.Elem()) {
+					continue
+				}
+				_, _ = fmt.Fprintf(w, "WARNING: type %q has pointer field %q (%s) which will be shared between states during model checking, potentially causing incorrect results. Consider using a value type instead.\n",
+					t.Name(), f.Name, f.Type)
+			case reflect.Struct:
+				checkType(f.Type)
+			}
+		}
+	}
+
+	for _, sm := range sms {
+		smType := reflect.TypeOf(sm)
+		checkType(smType)
+
+		innerSM := getInnerStateMachine(sm)
+		for state, builders := range innerSM.HandlerBuilders {
+			stateType := reflect.TypeOf(state)
+			checkType(stateType)
+
+			for _, bi := range builders {
+				eventType := reflect.TypeOf(bi.event)
+				checkType(eventType)
+			}
+		}
+	}
 }
