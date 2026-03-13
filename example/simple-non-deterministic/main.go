@@ -76,7 +76,7 @@ func createSimpleNonDeterministicModel() []goat.Option {
 func main() {
 	opts := createSimpleNonDeterministicModel()
 
-	err := goat.Test(opts...)
+	_, err := goat.Test(opts...)
 	if err != nil {
 		panic(err)
 	}

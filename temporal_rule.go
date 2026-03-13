@@ -30,7 +30,7 @@ type temporalRuleResult struct {
 //
 // Example:
 //
-//	err := goat.Test(
+//	result, err := goat.Test(
 //		goat.WithStateMachines(primary, replica),
 //		goat.WithRules(
 //			goat.WheneverPEventuallyQ(write, replicated),
@@ -72,7 +72,7 @@ func WheneverPEventuallyQ(p, q Condition) Rule {
 //
 // Example:
 //
-//	err := goat.Test(
+//	result, err := goat.Test(
 //		goat.WithStateMachines(nodes...),
 //		goat.WithRules(
 //			goat.EventuallyAlways(stable),
@@ -110,7 +110,7 @@ func EventuallyAlways(c Condition) Rule {
 //
 // Example:
 //
-//	err := goat.Test(
+//	result, err := goat.Test(
 //		goat.WithStateMachines(node),
 //		goat.WithRules(
 //			goat.AlwaysEventually(heartbeat),

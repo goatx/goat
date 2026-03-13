@@ -265,7 +265,7 @@ type options struct {
 //
 // Example:
 //
-//	goat.Test(
+//	result, err := goat.Test(
 //	    goat.WithStateMachines(sm1, sm2),
 //	    goat.WithRules(goat.Always(cond1)),
 //	)

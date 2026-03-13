@@ -99,7 +99,8 @@ func createTemporalRuleModel() []goat.Option {
 
 func main() {
 	opts := createTemporalRuleModel()
-	if err := goat.Test(opts...); err != nil {
+	_, err := goat.Test(opts...)
+	if err != nil {
 		panic(err)
 	}
 }

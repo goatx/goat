@@ -300,7 +300,7 @@ func createMeetingRoomWithoutExclusionModel() []goat.Option {
 
 func main() {
 	opts := createMeetingRoomWithoutExclusionModel()
-	err := goat.Test(opts...)
+	_, err := goat.Test(opts...)
 	if err != nil {
 		panic(err)
 	}

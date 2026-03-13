@@ -1,8 +1,6 @@
 package main
 
 import (
-	"bytes"
-	"encoding/json"
 	"testing"
 
 	"github.com/goatx/goat"
@@ -13,32 +11,19 @@ import (
 func TestMeetingRoomReservationWithExclusion(t *testing.T) {
 	opts := createMeetingRoomWithExclusionModel()
 
-	var buf bytes.Buffer
-	err := goat.Debug(&buf, opts...)
+	result, err := goat.Test(opts...)
 	if err != nil {
-		t.Fatalf("Debug failed: %v", err)
+		t.Fatalf("Test failed: %v", err)
 	}
 
-	var data map[string]any
-	if err := json.Unmarshal(buf.Bytes(), &data); err != nil {
-		t.Fatalf("Failed to parse JSON: %v", err)
+	expected := &goat.Result{
+		Summary: goat.Summary{TotalWorlds: 10792},
 	}
 
-	got, ok := data["summary"].(map[string]any)
-	if !ok {
-		t.Fatalf("Expected summary to be an object")
+	cmpOpts := cmp.Options{
+		cmpopts.IgnoreFields(goat.Summary{}, "ExecutionTimeMs"),
 	}
-
-	expectedSummary := map[string]any{
-		"total_worlds": float64(10792),
+	if diff := cmp.Diff(expected, result, cmpOpts...); diff != "" {
+		t.Errorf("result mismatch (-want +got):\n%s", diff)
 	}
-
-	ignoreOpts := cmpopts.IgnoreMapEntries(func(k string, _ any) bool {
-		return k == "execution_time_ms"
-	})
-
-	if diff := cmp.Diff(expectedSummary, got, ignoreOpts); diff != "" {
-		t.Errorf("Summary mismatch (-want +got):\n%s", diff)
-	}
-
 }

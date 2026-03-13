@@ -124,15 +124,15 @@ testStateMachine << entryEvent;" ];
 	}
 }
 
-func TestModel_writeInvariantViolations(t *testing.T) {
+func TestWriteInvariantViolations(t *testing.T) {
 	tests := []struct {
 		name  string
-		setup func() model
+		setup func() *Result
 		want  string
 	}{
 		{
 			name: "no invariant violations",
-			setup: func() model {
+			setup: func() *Result {
 				sm := newTestStateMachine(newTestState("initial"))
 				inv := BoolCondition("pass", true)
 				m, _ := newModel(
@@ -140,13 +140,13 @@ func TestModel_writeInvariantViolations(t *testing.T) {
 					WithRules(Always(inv)),
 				)
 				_ = m.Solve()
-				return m
+				return m.buildResult(nil, 0)
 			},
 			want: "",
 		},
 		{
 			name: "with invariant violation",
-			setup: func() model {
+			setup: func() *Result {
 				sm := newTestStateMachine(newTestState("initial"))
 				inv := BoolCondition("fail", false)
 				m, _ := newModel(
@@ -154,7 +154,7 @@ func TestModel_writeInvariantViolations(t *testing.T) {
 					WithRules(Always(inv)),
 				)
 				_ = m.Solve()
-				return m
+				return m.buildResult(nil, 0)
 			},
 			want: `Condition failed. Not Always fail.
 Path (length = 1):
@@ -169,9 +169,15 @@ Path (length = 1):
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			m := tt.setup()
+			result := tt.setup()
+			var invariants []Violation
+			for _, v := range result.Violations {
+				if v.Loop == nil {
+					invariants = append(invariants, v)
+				}
+			}
 			var buf bytes.Buffer
-			m.writeInvariantViolations(&buf)
+			writeInvariantViolations(&buf, invariants)
 			got := buf.String()
 
 			if got != tt.want {
@@ -181,7 +187,7 @@ Path (length = 1):
 	}
 }
 
-func TestModel_writeTemporalViolations(t *testing.T) {
+func TestWriteTemporalViolations(t *testing.T) {
 	sm := newTestStateMachine(newTestState("s"))
 	cFalse := BoolCondition("c", false)
 	m, err := newModel(
@@ -193,9 +199,18 @@ func TestModel_writeTemporalViolations(t *testing.T) {
 	}
 	_ = m.Solve()
 
-	results := m.checkLTL()
+	trResults := m.checkLTL()
+	result := m.buildResult(trResults, 0)
+
+	var temporals []Violation
+	for _, v := range result.Violations {
+		if v.Loop != nil {
+			temporals = append(temporals, v)
+		}
+	}
+
 	var buf bytes.Buffer
-	m.writeTemporalViolations(&buf, results)
+	writeTemporalViolations(&buf, temporals)
 	got := buf.String()
 
 	want := `Condition failed. Not eventually always c.
