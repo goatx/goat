@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.6.0](https://github.com/goatx/goat/releases/tag/v0.6.0) - 2026-03-13
+
+### Added
+- Deep copy support for map and slice fields in clone operations
+
+### Changed
+- **Breaking:** `goat.Test` now returns `*Result` instead of `error`
+  - New `Result` type provides structured access to verification results (worlds, rule violations, temporal rule results)
+
 ## [0.5.0](https://github.com/goatx/goat/releases/tag/v0.5.0) - 2025-12-13
 
 ### Added
