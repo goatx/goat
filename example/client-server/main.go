@@ -176,7 +176,7 @@ func createClientServerModel() []goat.Option {
 
 func main() {
 	opts := createClientServerModel()
-	err := goat.Test(opts...)
+	_, err := goat.Test(opts...)
 	if err != nil {
 		panic(err)
 	}

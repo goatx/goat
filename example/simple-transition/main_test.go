@@ -1,9 +1,6 @@
 package main
 
 import (
-	"bytes"
-	"encoding/json"
-	"os"
 	"testing"
 
 	"github.com/goatx/goat"
@@ -14,35 +11,71 @@ import (
 func TestSimpleTransition(t *testing.T) {
 	opts := createSimpleTransitionModel()
 
-	var buf bytes.Buffer
-	err := goat.Debug(&buf, opts...)
+	result, err := goat.Test(opts...)
 	if err != nil {
-		t.Fatalf("Debug failed: %v", err)
+		t.Fatalf("Test failed: %v", err)
 	}
 
-	var data map[string]any
-	if err := json.Unmarshal(buf.Bytes(), &data); err != nil {
-		t.Fatalf("Failed to parse JSON: %v", err)
-	}
-
-	expectedWorldsData, err := os.ReadFile("expected_worlds.json.golden")
-	if err != nil {
-		t.Fatalf("Failed to read expected worlds file: %v", err)
-	}
-
-	var expectedWorlds any
-	if err := json.Unmarshal(expectedWorldsData, &expectedWorlds); err != nil {
-		t.Fatalf("Failed to parse expected worlds JSON: %v", err)
+	expected := &goat.Result{
+		Violations: []goat.Violation{
+			{
+				Rule: "Always mut<=1",
+				Path: []goat.WorldSnapshot{
+					{
+						StateMachines: []goat.StateMachineSnapshot{
+							{Name: "StateMachine", State: "{Name:StateType,Type:main.StateType,Value:A}", Details: "{Name:Mut,Type:int,Value:0}"},
+						},
+						QueuedEvents: []goat.EventSnapshot{
+							{TargetMachine: "StateMachine", EventName: "entryEvent", Details: "no fields"},
+						},
+					},
+					{
+						StateMachines: []goat.StateMachineSnapshot{
+							{Name: "StateMachine", State: "{Name:StateType,Type:main.StateType,Value:A}", Details: "{Name:Mut,Type:int,Value:1}"},
+						},
+						QueuedEvents: []goat.EventSnapshot{
+							{TargetMachine: "StateMachine", EventName: "exitEvent", Details: "no fields"},
+							{TargetMachine: "StateMachine", EventName: "transitionEvent", Details: "{Name:To,Type:goat.AbstractState,Value:&{{0} B}}"},
+							{TargetMachine: "StateMachine", EventName: "entryEvent", Details: "no fields"},
+						},
+					},
+					{
+						StateMachines: []goat.StateMachineSnapshot{
+							{Name: "StateMachine", State: "{Name:StateType,Type:main.StateType,Value:A}", Details: "{Name:Mut,Type:int,Value:1}"},
+						},
+						QueuedEvents: []goat.EventSnapshot{
+							{TargetMachine: "StateMachine", EventName: "transitionEvent", Details: "{Name:To,Type:goat.AbstractState,Value:&{{0} B}}"},
+							{TargetMachine: "StateMachine", EventName: "entryEvent", Details: "no fields"},
+						},
+					},
+					{
+						StateMachines: []goat.StateMachineSnapshot{
+							{Name: "StateMachine", State: "{Name:StateType,Type:main.StateType,Value:B}", Details: "{Name:Mut,Type:int,Value:1}"},
+						},
+						QueuedEvents: []goat.EventSnapshot{
+							{TargetMachine: "StateMachine", EventName: "entryEvent", Details: "no fields"},
+						},
+					},
+					{
+						StateMachines: []goat.StateMachineSnapshot{
+							{Name: "StateMachine", State: "{Name:StateType,Type:main.StateType,Value:B}", Details: "{Name:Mut,Type:int,Value:2}"},
+						},
+						QueuedEvents: []goat.EventSnapshot{
+							{TargetMachine: "StateMachine", EventName: "exitEvent", Details: "no fields"},
+							{TargetMachine: "StateMachine", EventName: "transitionEvent", Details: "{Name:To,Type:goat.AbstractState,Value:&{{0} C}}"},
+							{TargetMachine: "StateMachine", EventName: "entryEvent", Details: "no fields"},
+						},
+					},
+				},
+			},
+		},
+		Summary: goat.Summary{TotalWorlds: 8},
 	}
 
 	cmpOpts := cmp.Options{
-		cmpopts.IgnoreMapEntries(func(k, v any) bool {
-			key, ok := k.(string)
-			return ok && key == "summary"
-		}),
+		cmpopts.IgnoreFields(goat.Summary{}, "ExecutionTimeMs"),
 	}
-
-	if diff := cmp.Diff(expectedWorlds, data["worlds"], cmpOpts...); diff != "" {
-		t.Errorf("Worlds mismatch (-expected +actual):\n%s", diff)
+	if diff := cmp.Diff(expected, result, cmpOpts...); diff != "" {
+		t.Errorf("result mismatch (-want +got):\n%s", diff)
 	}
 }

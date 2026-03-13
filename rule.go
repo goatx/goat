@@ -21,7 +21,7 @@ func (f ruleFunc) apply(o *options) {
 //
 // Example:
 //
-//	err := goat.Test(
+//	result, err := goat.Test(
 //		goat.WithStateMachines(node),
 //		goat.WithRules(
 //			goat.Always(consistency),
@@ -48,7 +48,7 @@ func WithRules(rs ...Rule) Option {
 //
 // Example:
 //
-//	err := goat.Test(
+//	result, err := goat.Test(
 //		goat.WithStateMachines(node),
 //		goat.WithRules(
 //			goat.Always(healthy),

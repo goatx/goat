@@ -70,29 +70,28 @@ func (m *model) writeDot(w io.Writer) {
 	_, _ = io.WriteString(w, sb.String())
 }
 
-func (m *model) writeInvariantViolations(w io.Writer) {
+func writeInvariantViolations(w io.Writer, violations []Violation) {
 	var sb strings.Builder
-	violations := m.collectInvariantViolations()
-	for i, violation := range violations {
+	for i, v := range violations {
 		if i > 0 {
 			sb.WriteString("\n")
 		}
 
-		name := violation.condition.String()
-		if name == "" {
+		if v.Rule == "" {
 			sb.WriteString("Condition failed.\n")
 		} else {
-			sb.WriteString("Condition failed. Not Always ")
-			sb.WriteString(name)
+			sb.WriteString("Condition failed. Not ")
+			sb.WriteString(v.Rule)
 			sb.WriteString(".\n")
 		}
 
 		sb.WriteString("Path (length = ")
-		fmt.Fprintf(&sb, "%d", len(violation.path))
+		fmt.Fprintf(&sb, "%d", len(v.Path))
 		sb.WriteString("):\n")
 
-		m.writeWorldSequence(&sb, violation.path, func(idx int, w world) string {
-			if idx == len(violation.path)-1 {
+		pathLen := len(v.Path)
+		writeWorldSequence(&sb, v.Path, func(idx int) string {
+			if idx == pathLen-1 {
 				return "<-- violation here"
 			}
 			return ""
@@ -102,26 +101,17 @@ func (m *model) writeInvariantViolations(w io.Writer) {
 	_, _ = io.WriteString(w, sb.String())
 }
 
-func (m *model) writeTemporalViolations(w io.Writer, results []temporalRuleResult) {
+func writeTemporalViolations(w io.Writer, violations []Violation) {
 	var sb strings.Builder
 	block := 0
 
-	for _, res := range results {
-		if res.Satisfied {
-			continue
-		}
-
-		lasso, ok := res.Evidence.(*lasso)
-		if !ok || lasso == nil {
-			continue
-		}
-
+	for _, v := range violations {
 		if block > 0 {
 			sb.WriteString("\n")
 		}
 		block++
 
-		rule := strings.TrimSpace(res.Rule)
+		rule := strings.TrimSpace(v.Rule)
 		if rule == "" {
 			sb.WriteString("Condition failed.\n")
 		} else {
@@ -130,16 +120,16 @@ func (m *model) writeTemporalViolations(w io.Writer, results []temporalRuleResul
 			sb.WriteString(".\n")
 		}
 
-		prefixLen := len(lasso.Prefix)
-		loopLen := len(lasso.Loop)
+		prefixLen := len(v.Path)
+		loopLen := len(v.Loop)
 
-		sequence := make([]worldID, 0, prefixLen+loopLen)
-		sequence = append(sequence, lasso.Prefix...)
+		sequence := make([]WorldSnapshot, 0, prefixLen+loopLen)
+		sequence = append(sequence, v.Path...)
 		if loopLen > 0 {
-			if prefixLen == 0 || lasso.Prefix[prefixLen-1] != lasso.Loop[0] {
-				sequence = append(sequence, lasso.Loop...)
+			if prefixLen == 0 || !reflect.DeepEqual(v.Path[prefixLen-1], v.Loop[0]) {
+				sequence = append(sequence, v.Loop...)
 			} else {
-				sequence = append(sequence, lasso.Loop[1:]...)
+				sequence = append(sequence, v.Loop[1:]...)
 			}
 		}
 
@@ -153,7 +143,7 @@ func (m *model) writeTemporalViolations(w io.Writer, results []temporalRuleResul
 		fmt.Fprintf(&sb, "%d", len(sequence))
 		sb.WriteString("):\n")
 
-		m.writeWorldSequence(&sb, sequence, nil)
+		writeWorldSequence(&sb, sequence, nil)
 	}
 
 	if block == 0 {
@@ -163,41 +153,37 @@ func (m *model) writeTemporalViolations(w io.Writer, results []temporalRuleResul
 	_, _ = io.WriteString(w, sb.String())
 }
 
-func (m *model) writeWorldSequence(sb *strings.Builder, worldIDs []worldID, annotate func(int, world) string) {
-	for idx, worldID := range worldIDs {
-		world := m.worlds[worldID]
-
+func writeWorldSequence(sb *strings.Builder, snapshots []WorldSnapshot, annotate func(int) string) {
+	for idx, snap := range snapshots {
 		sb.WriteString("  [")
 		fmt.Fprintf(sb, "%d", idx)
 		sb.WriteString("]")
 		if annotate != nil {
-			if annotation := annotate(idx, world); annotation != "" {
+			if annotation := annotate(idx); annotation != "" {
 				sb.WriteString(" ")
 				sb.WriteString(annotation)
 			}
 		}
 		sb.WriteString("\n")
 		sb.WriteString("  StateMachines:\n")
-		for _, sm := range world.env.machines {
+		for _, sm := range snap.StateMachines {
 			sb.WriteString("    Name: ")
-			sb.WriteString(getStateMachineName(sm))
+			sb.WriteString(sm.Name)
 			sb.WriteString(", Detail: ")
-			sb.WriteString(getStateMachineDetails(sm))
+			sb.WriteString(sm.Details)
 			sb.WriteString(", State: ")
-			sb.WriteString(getStateDetails(sm.currentState()))
+			sb.WriteString(sm.State)
 			sb.WriteString("\n")
 		}
 		sb.WriteString("  QueuedEvents:\n")
-		for smID, events := range world.env.queue {
-			for _, event := range events {
-				sb.WriteString("    StateMachine: ")
-				sb.WriteString(getStateMachineName(world.env.machines[smID]))
-				sb.WriteString(", Event: ")
-				sb.WriteString(getEventName(event))
-				sb.WriteString(", Detail: ")
-				sb.WriteString(getEventDetails(event))
-				sb.WriteString("\n")
-			}
+		for _, ev := range snap.QueuedEvents {
+			sb.WriteString("    StateMachine: ")
+			sb.WriteString(ev.TargetMachine)
+			sb.WriteString(", Event: ")
+			sb.WriteString(ev.EventName)
+			sb.WriteString(", Detail: ")
+			sb.WriteString(ev.Details)
+			sb.WriteString("\n")
 		}
 	}
 }

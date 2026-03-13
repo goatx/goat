@@ -1,6 +1,0 @@
-[
-  {
-    "rule": "whenever inPaid eventually inShipped",
-    "satisfied": true
-  }
-]

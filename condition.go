@@ -11,7 +11,7 @@ func (c ConditionName) String() string {
 
 // Condition represents a named predicate evaluated against a world.
 // Implementations must return true when the condition holds for the
-// provided world state, and false otherwise.
+// provided world, and false otherwise.
 type Condition interface {
 	Name() ConditionName
 	Evaluate(w world) bool
